@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-const APK = 'https://github.com/abhimanpanwar6/scry/releases/latest/download/Scry.apk';
+const APK = 'https://github.com/kroszborg/scry/releases/latest/download/Scry.apk';
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
 function LogoMark({ size = 24 }: { size?: number }) {
