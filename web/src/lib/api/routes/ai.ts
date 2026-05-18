@@ -23,8 +23,7 @@ export const ai = new Hono()
               content: [
                 {
                   type: "image",
-                  image: imageBase64 as string,
-                  mimeType: "image/jpeg",
+                  image: new URL(`data:image/jpeg;base64,${imageBase64}`),
                 },
                 {
                   type: "text",

@@ -13,15 +13,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import Constants from "expo-constants";
 import { useLocalSearchParams } from "expo-router";
+import { api } from "../../lib/api";
 import { colors, spacing, radius, typography } from "../../lib/theme";
 import { Sparkle, ArrowUp } from "phosphor-react-native";
-
-const baseUrl =
-  Constants.expoConfig?.extra?.apiUrl ??
-  process.env.EXPO_PUBLIC_API_URL ??
-  "http://localhost:4200";
 
 const suggestions = [
   "Summarize all my biology notes",
@@ -39,7 +34,7 @@ export default function AIScreen() {
   const didAutoSend = useRef(false);
 
   const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({ api: `${baseUrl}/api/agent/messages` }),
+    transport: new DefaultChatTransport({ api: `${api.baseUrl}/api/agent/messages` }),
   });
 
   const isLoading = status === "streaming" || status === "submitted";

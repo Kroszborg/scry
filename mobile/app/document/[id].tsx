@@ -39,7 +39,6 @@ import {
   MathOperations,
   PencilSimple,
   FilePdf,
-  MarkdownLogo,
 } from "phosphor-react-native";
 
 type Tab = "Preview" | "Text" | "AI" | "Export";
@@ -727,7 +726,7 @@ export default function DocumentScreen() {
             activeOpacity={0.75}
           >
             <View style={[styles.exportIcon, styles.exportIconMd]}>
-              <MarkdownLogo size={22} color="#0D74CE" weight="duotone" />
+              <PencilSimple size={22} color="#0D74CE" weight="duotone" />
             </View>
             <View style={styles.exportInfo}>
               <Text style={styles.exportLabel}>Markdown</Text>
