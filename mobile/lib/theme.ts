@@ -1,0 +1,123 @@
+export const colors = {
+  background: "#0A0A0C",
+  surface: "#111114",
+  surfaceElevated: "#18181C",
+  surfaceBorder: "#1E1E23",
+  accent: "#7C5CFC",
+  accentLight: "#9B7FFF",
+  accentDim: "rgba(124, 92, 252, 0.12)",
+  accentDimBorder: "rgba(124, 92, 252, 0.25)",
+  textPrimary: "#F2F2F5",
+  textSecondary: "#8A8D99",
+  textTertiary: "#3E414D",
+  success: "#22C55E",
+  successDim: "rgba(34, 197, 94, 0.12)",
+  danger: "#F04545",
+  dangerDim: "rgba(240, 69, 69, 0.12)",
+  warning: "#F59E0B",
+  border: "rgba(255,255,255,0.055)",
+  borderSubtle: "rgba(255,255,255,0.03)",
+  white: "#FFFFFF",
+};
+
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  xxxl: 32,
+  xxxxl: 40,
+};
+
+export const radius = {
+  xs: 6,
+  sm: 10,
+  md: 14,
+  lg: 18,
+  xl: 22,
+  xxl: 28,
+  full: 999,
+};
+
+// Typography — tighter tracking, better weight hierarchy
+export const typography = {
+  display: {
+    fontSize: 34,
+    fontWeight: "700" as const,
+    letterSpacing: -1.2,
+    lineHeight: 40,
+    color: colors.textPrimary,
+  },
+  h1: {
+    fontSize: 26,
+    fontWeight: "700" as const,
+    letterSpacing: -0.8,
+    lineHeight: 32,
+    color: colors.textPrimary,
+  },
+  h2: {
+    fontSize: 21,
+    fontWeight: "600" as const,
+    letterSpacing: -0.5,
+    lineHeight: 28,
+    color: colors.textPrimary,
+  },
+  h3: {
+    fontSize: 17,
+    fontWeight: "600" as const,
+    letterSpacing: -0.3,
+    lineHeight: 24,
+    color: colors.textPrimary,
+  },
+  h4: {
+    fontSize: 15,
+    fontWeight: "600" as const,
+    letterSpacing: -0.2,
+    lineHeight: 21,
+    color: colors.textPrimary,
+  },
+  body: {
+    fontSize: 15,
+    fontWeight: "400" as const,
+    letterSpacing: -0.1,
+    lineHeight: 22,
+    color: colors.textPrimary,
+  },
+  bodyMedium: {
+    fontSize: 15,
+    fontWeight: "500" as const,
+    letterSpacing: -0.1,
+    lineHeight: 22,
+    color: colors.textPrimary,
+  },
+  bodySmall: {
+    fontSize: 13,
+    fontWeight: "400" as const,
+    letterSpacing: 0,
+    lineHeight: 18,
+    color: colors.textSecondary,
+  },
+  caption: {
+    fontSize: 12,
+    fontWeight: "400" as const,
+    letterSpacing: 0.1,
+    lineHeight: 16,
+    color: colors.textSecondary,
+  },
+  label: {
+    fontSize: 11,
+    fontWeight: "600" as const,
+    letterSpacing: 0.8,
+    lineHeight: 14,
+    color: colors.textSecondary,
+  },
+  micro: {
+    fontSize: 10,
+    fontWeight: "500" as const,
+    letterSpacing: 0.5,
+    lineHeight: 14,
+    color: colors.textTertiary,
+  },
+};

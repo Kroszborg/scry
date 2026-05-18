@@ -1,0 +1,32 @@
+{
+  "name": "scry-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "db:push": "bun --env-file=../.env drizzle-kit push",
+    "db:studio": "bun --env-file=../.env drizzle-kit studio"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.17.2",
+    "@runablehq/website-runtime": "^0.10.0",
+    "ai": "^6.0.184",
+    "dedent": "^1.7.2",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.12.10",
+    "next": "^15.3.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.8",
+    "@types/node": "^25.3.5",
+    "@types/react": "^19.1.17",
+    "@types/react-dom": "^19.1.11",
+    "drizzle-kit": "^0.31.10",
+    "tailwindcss": "^4.1.8",
+    "typescript": "^5.8.3"
+  }
+}

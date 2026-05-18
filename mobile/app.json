@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "icon": "./assets/icon.png",
+    "android": {
+      "package": "com.scry_x7k2.runable",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0B0B0D"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "extra": {
+      "apiUrl": "https://z7512dle8f43t20tfe8sg-preview-4200.runable.site/",
+      "router": {
+        "headOrigin": "https://z7512dle8f43t20tfe8sg-preview-4300.runable.site",
+        "origin": "https://z7512dle8f43t20tfe8sg-preview-4300.runable.site"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.scry_x7k2.runable",
+      "supportsTablet": false
+    },
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#0B0B0D"
+    },
+    "name": "Scry",
+    "slug": "scry",
+    "version": "1.0.0",
+    "scheme": "scry",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-camera",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Scry needs access to your photos to import documents."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Scry to access your photos.",
+          "savePhotosPermission": "Allow Scry to save document scans.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ],
+      "expo-font"
+    ]
+  }
+}

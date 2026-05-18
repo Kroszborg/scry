@@ -1,0 +1,11 @@
+{
+  "name": "scry",
+  "private": true,
+  "packageManager": "bun@1.3.5",
+  "workspaces": ["web"],
+  "scripts": {
+    "dev:web": "cd web && bun run dev",
+    "dev:mobile": "cd mobile && npm run dev",
+    "build:web": "cd web && bun run build"
+  }
+}
