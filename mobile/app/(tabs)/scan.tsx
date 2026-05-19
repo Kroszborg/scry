@@ -10,7 +10,7 @@ import {
   Image,
   Animated,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
@@ -27,6 +27,7 @@ import {
   FloppyDisk,
   ArrowCounterClockwise,
   FilePdf,
+  Images,
 } from "phosphor-react-native";
 
 const MODES: ScanMode[] = ["Notes", "Book", "Whiteboard", "Receipt", "ID Card"];
@@ -46,6 +47,7 @@ export default function ScanScreen() {
   const queryClient = useQueryClient();
   const cameraRef = useRef<CameraView>(null);
   const scanLineAnim = useRef(new Animated.Value(0)).current;
+  const insets = useSafeAreaInsets();
 
   const [permission, requestPermission] = useCameraPermissions();
   const [step, setStep] = useState<ScanStep>("camera");
@@ -56,13 +58,12 @@ export default function ScanScreen() {
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Animated scan line in camera view
   useEffect(() => {
     const loop = Animated.loop(
       Animated.sequence([
         Animated.timing(scanLineAnim, {
           toValue: 1,
-          duration: 2200,
+          duration: 2400,
           useNativeDriver: true,
         }),
         Animated.timing(scanLineAnim, {
@@ -90,7 +91,7 @@ export default function ScanScreen() {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
       const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.9,
+        quality: 0.92,
         base64: false,
       });
       if (photo?.uri) {
@@ -105,7 +106,7 @@ export default function ScanScreen() {
   const handleImport = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
-      quality: 0.9,
+      quality: 0.92,
     });
     if (!result.canceled && result.assets[0]) {
       setCapturedUri(result.assets[0].uri);
@@ -118,21 +119,9 @@ export default function ScanScreen() {
     setIsProcessing(true);
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     try {
-      // Persist image to permanent storage
       const persistedUri = await persistImage(capturedUri);
 
-      // Read as base64 for server-side Gemini Vision OCR
-      let imageBase64: string | undefined;
-      if (aiEnabled) {
-        try {
-          imageBase64 = await FileSystem.readAsStringAsync(persistedUri, {
-            encoding: FileSystem.EncodingType.Base64,
-          });
-        } catch {
-          // non-fatal — AI will still process with empty rawText fallback
-        }
-      }
-
+      // imageBase64 is NOT sent here — it will be read + compressed during AI processing
       const result = await createDoc.mutateAsync({
         title: "Scanned Document",
         category: activeMode === "ID Card" ? "ID" : activeMode,
@@ -141,7 +130,6 @@ export default function ScanScreen() {
         summary: "",
         tags: "[]",
         imageUris: JSON.stringify([persistedUri]),
-        imageBase64: imageBase64 ?? null,
         scanMode: activeMode,
       });
       const docId = (result as any).document?.id;
@@ -154,7 +142,7 @@ export default function ScanScreen() {
       setStep("camera");
       setCapturedUri(null);
     } catch {
-      Alert.alert("Error", "Could not save document.");
+      Alert.alert("Save failed", "Could not save document. Check your connection.");
     } finally {
       setIsProcessing(false);
     }
@@ -175,10 +163,10 @@ export default function ScanScreen() {
 
   if (!permission.granted) {
     return (
-      <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <SafeAreaView style={styles.container} edges={["top", "left", "right", "bottom"]}>
         <View style={styles.permView}>
           <View style={styles.permIcon}>
-            <Scan size={48} color={colors.accent} weight="duotone" />
+            <Scan size={44} color={colors.accent} weight="duotone" />
           </View>
           <Text style={styles.permTitle}>Camera access needed</Text>
           <Text style={styles.permSub}>
@@ -196,8 +184,8 @@ export default function ScanScreen() {
             onPress={handleImport}
             activeOpacity={0.75}
           >
-            <FilePdf size={18} color={colors.textSecondary} weight="duotone" />
-            <Text style={styles.importRowText}>Import from photos</Text>
+            <Images size={18} color={colors.textSecondary} weight="duotone" />
+            <Text style={styles.importRowText}>Import from photos instead</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -206,12 +194,12 @@ export default function ScanScreen() {
 
   if (step === "preview" && capturedUri) {
     return (
-      <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <SafeAreaView style={styles.container} edges={["top", "left", "right", "bottom"]}>
         <View style={styles.previewHeader}>
           <TouchableOpacity onPress={handleRetake} style={styles.iconBtn}>
-            <ArrowCounterClockwise size={22} color={colors.textPrimary} />
+            <X size={20} color={colors.textPrimary} />
           </TouchableOpacity>
-          <Text style={styles.previewTitle}>Preview</Text>
+          <Text style={styles.previewTitle}>Review Scan</Text>
           <View style={{ width: 44 }} />
         </View>
 
@@ -227,9 +215,9 @@ export default function ScanScreen() {
           </View>
           {aiEnabled && (
             <View style={[styles.previewMetaPill, styles.previewMetaAI]}>
-              <Sparkle size={12} color={colors.accent} weight="fill" />
+              <Sparkle size={11} color={colors.accent} weight="fill" />
               <Text style={[styles.previewMetaText, { color: colors.accent }]}>
-                AI enabled
+                AI on
               </Text>
             </View>
           )}
@@ -241,7 +229,7 @@ export default function ScanScreen() {
             onPress={handleRetake}
             activeOpacity={0.75}
           >
-            <ArrowCounterClockwise size={20} color={colors.textSecondary} />
+            <ArrowCounterClockwise size={18} color={colors.textSecondary} />
             <Text style={styles.retakeBtnText}>Retake</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -253,10 +241,10 @@ export default function ScanScreen() {
             {isProcessing ? (
               <ActivityIndicator color="#fff" size="small" />
             ) : (
-              <FloppyDisk size={20} color="#fff" weight="fill" />
+              <FloppyDisk size={18} color="#fff" weight="fill" />
             )}
             <Text style={styles.saveBtnText}>
-              {isProcessing ? "Saving..." : "Save & Process"}
+              {isProcessing ? "Saving…" : "Save & Process"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -266,19 +254,22 @@ export default function ScanScreen() {
 
   const scanLineTranslateY = scanLineAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 200],
+    outputRange: [0, 210],
   });
+
+  const bottomBarBottom = insets.bottom + 28;
 
   return (
     <View style={styles.cameraOuter}>
       <CameraView ref={cameraRef} style={styles.camera} facing="back">
+        {/* Top overlay */}
         <SafeAreaView style={styles.cameraOverlay} edges={["top"]}>
           <View style={styles.topBar}>
             <TouchableOpacity
               style={styles.iconBtnDark}
               onPress={() => router.push("/(tabs)/index" as any)}
             >
-              <X size={22} color="#fff" />
+              <X size={20} color="#fff" />
             </TouchableOpacity>
 
             <Text style={styles.modeTitle}>{activeMode}</Text>
@@ -289,8 +280,8 @@ export default function ScanScreen() {
               activeOpacity={0.8}
             >
               <Sparkle
-                size={16}
-                color={aiEnabled ? colors.accent : "rgba(255,255,255,0.55)"}
+                size={15}
+                color={aiEnabled ? colors.accent : "rgba(255,255,255,0.5)"}
                 weight={aiEnabled ? "fill" : "regular"}
               />
               <Text
@@ -327,7 +318,7 @@ export default function ScanScreen() {
           </ScrollView>
         </SafeAreaView>
 
-        {/* Scanner frame with animated scan line */}
+        {/* Scanner frame */}
         <View style={styles.frame} pointerEvents="none">
           <View style={[styles.corner, styles.tl]} />
           <View style={[styles.corner, styles.tr]} />
@@ -341,13 +332,14 @@ export default function ScanScreen() {
           />
         </View>
 
-        <View style={styles.bottomBar}>
+        {/* Bottom controls — use insets.bottom to stay above gesture bar */}
+        <View style={[styles.bottomBar, { bottom: bottomBarBottom }]}>
           <TouchableOpacity
             style={styles.importBtn}
             onPress={handleImport}
             activeOpacity={0.8}
           >
-            <FilePdf size={22} color="#fff" weight="duotone" />
+            <Images size={22} color="#fff" weight="duotone" />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -382,16 +374,23 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   permIcon: {
-    width: 96,
-    height: 96,
+    width: 88,
+    height: 88,
     borderRadius: radius.full,
     backgroundColor: colors.accentDim,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.accentDimBorder,
   },
   permTitle: { ...typography.h2, textAlign: "center" },
-  permSub: { ...typography.bodySmall, textAlign: "center", lineHeight: 21 },
+  permSub: {
+    ...typography.bodySmall,
+    textAlign: "center",
+    lineHeight: 22,
+    maxWidth: 260,
+  },
   permBtn: {
     backgroundColor: colors.accent,
     paddingHorizontal: spacing.xxxl,
@@ -416,11 +415,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.lg,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
   previewTitle: { ...typography.h3 },
   iconBtn: {
-    width: 44,
-    height: 44,
+    width: 42,
+    height: 42,
     borderRadius: radius.full,
     backgroundColor: colors.surface,
     alignItems: "center",
@@ -445,18 +446,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 6,
     borderRadius: radius.full,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
   },
-  previewMetaAI: { backgroundColor: colors.accentDim },
+  previewMetaAI: {
+    backgroundColor: colors.accentDim,
+    borderColor: colors.accentDimBorder,
+  },
   previewMetaText: {
-    fontSize: 13,
-    fontWeight: "500",
+    fontSize: 12,
+    fontWeight: "600",
     color: colors.textSecondary,
   },
   previewActions: {
     flexDirection: "row",
     gap: spacing.md,
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xxxl,
+    paddingBottom: spacing.xl,
     paddingTop: spacing.sm,
   },
   retakeBtn: {
@@ -468,6 +474,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     paddingVertical: spacing.lg,
     borderRadius: radius.xl,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
   },
   retakeBtnText: {
     ...typography.bodyMedium,
@@ -502,20 +510,25 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
   },
   iconBtnDark: {
-    width: 42,
-    height: 42,
+    width: 40,
+    height: 40,
     borderRadius: radius.full,
     backgroundColor: "rgba(0,0,0,0.55)",
     alignItems: "center",
     justifyContent: "center",
   },
-  modeTitle: { ...typography.h3, color: "#fff" },
+  modeTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#fff",
+    letterSpacing: -0.2,
+  },
   aiToggle: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
+    paddingHorizontal: 13,
+    paddingVertical: 8,
     borderRadius: radius.full,
     backgroundColor: "rgba(0,0,0,0.5)",
   },
@@ -527,7 +540,7 @@ const styles = StyleSheet.create({
   aiToggleText: {
     fontSize: 13,
     fontWeight: "600",
-    color: "rgba(255,255,255,0.6)",
+    color: "rgba(255,255,255,0.55)",
   },
   aiToggleTextOn: { color: colors.accent },
   modesRow: {
@@ -538,14 +551,18 @@ const styles = StyleSheet.create({
   },
   modeChip: {
     paddingHorizontal: spacing.lg,
-    paddingVertical: 9,
+    paddingVertical: 8,
     borderRadius: radius.full,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    marginRight: spacing.xs,
+    backgroundColor: "rgba(0,0,0,0.48)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
   },
-  modeChipOn: { backgroundColor: colors.accent },
+  modeChipOn: {
+    backgroundColor: colors.accent,
+    borderColor: "transparent",
+  },
   modeChipText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "500",
     color: "rgba(255,255,255,0.65)",
   },
@@ -562,31 +579,54 @@ const styles = StyleSheet.create({
   },
   corner: {
     position: "absolute",
-    width: 26,
-    height: 26,
-    borderColor: colors.accent,
+    width: 24,
+    height: 24,
+    borderColor: "#fff",
     borderWidth: 2.5,
   },
-  tl: { top: 0, left: 0, borderRightWidth: 0, borderBottomWidth: 0, borderTopLeftRadius: 6 },
-  tr: { top: 0, right: 0, borderLeftWidth: 0, borderBottomWidth: 0, borderTopRightRadius: 6 },
-  bl: { bottom: 0, left: 0, borderRightWidth: 0, borderTopWidth: 0, borderBottomLeftRadius: 6 },
-  br: { bottom: 0, right: 0, borderLeftWidth: 0, borderTopWidth: 0, borderBottomRightRadius: 6 },
+  tl: {
+    top: 0,
+    left: 0,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+    borderTopLeftRadius: 5,
+  },
+  tr: {
+    top: 0,
+    right: 0,
+    borderLeftWidth: 0,
+    borderBottomWidth: 0,
+    borderTopRightRadius: 5,
+  },
+  bl: {
+    bottom: 0,
+    left: 0,
+    borderRightWidth: 0,
+    borderTopWidth: 0,
+    borderBottomLeftRadius: 5,
+  },
+  br: {
+    bottom: 0,
+    right: 0,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderBottomRightRadius: 5,
+  },
   scanLine: {
     position: "absolute",
     left: 0,
     right: 0,
-    height: 2,
+    height: 1.5,
     backgroundColor: colors.accent,
-    opacity: 0.7,
+    opacity: 0.8,
     shadowColor: colors.accent,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.9,
-    shadowRadius: 6,
+    shadowOpacity: 1,
+    shadowRadius: 8,
   },
 
   bottomBar: {
     position: "absolute",
-    bottom: 52,
     left: 0,
     right: 0,
     flexDirection: "row",
@@ -596,26 +636,28 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   captureBtn: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 78,
+    height: 78,
+    borderRadius: 39,
     borderWidth: 3,
-    borderColor: "#fff",
+    borderColor: "rgba(255,255,255,0.85)",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "transparent",
   },
   captureBtnInner: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: "#fff",
   },
   importBtn: {
-    width: 52,
-    height: 52,
+    width: 50,
+    height: 50,
     borderRadius: radius.full,
     backgroundColor: "rgba(0,0,0,0.5)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
     alignItems: "center",
     justifyContent: "center",
   },

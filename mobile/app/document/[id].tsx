@@ -13,7 +13,7 @@ import {
   Platform,
   Share,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useChat } from "@ai-sdk/react";
@@ -21,6 +21,7 @@ import { DefaultChatTransport } from "ai";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
+import * as ImageManipulator from "expo-image-manipulator";
 import { api } from "../../lib/api";
 import { colors, spacing, radius, typography } from "../../lib/theme";
 import type { Document, Flashcard } from "../../lib/store";
@@ -50,6 +51,7 @@ export default function DocumentScreen() {
     autoProcess?: string;
   }>();
   const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<Tab>("Preview");
   const [isProcessing, setIsProcessing] = useState(false);
   const [editingText, setEditingText] = useState(false);
@@ -109,14 +111,37 @@ export default function DocumentScreen() {
     if (!doc) return;
     setIsProcessing(true);
     try {
+      // Parse stored image URIs
+      const uris: string[] =
+        typeof doc.imageUris === "string"
+          ? JSON.parse(doc.imageUris)
+          : (doc.imageUris as string[]) ?? [];
+
+      // Compress first image to keep payload manageable (~300-600KB base64)
+      let imageBase64: string | undefined;
+      if (uris.length > 0) {
+        try {
+          const compressed = await ImageManipulator.manipulateAsync(
+            uris[0],
+            [{ resize: { width: 1024 } }],
+            { compress: 0.75, format: ImageManipulator.SaveFormat.JPEG }
+          );
+          imageBase64 = await FileSystem.readAsStringAsync(compressed.uri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+        } catch {
+          // Continue without vision — AI will process rawText only
+        }
+      }
+
       await fetch(`${api.baseUrl}/api/ai/process`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           documentId: id,
-          rawText:
-            doc.rawText || "Document scanned. No text extracted yet.",
+          rawText: doc.rawText || "",
           scanMode: doc.scanMode,
+          imageBase64,
         }),
       });
       queryClient.invalidateQueries({ queryKey: ["document", id] });
@@ -661,7 +686,7 @@ export default function DocumentScreen() {
           </ScrollView>
 
           {/* Chat input */}
-          <View style={styles.chatInputArea}>
+          <View style={[styles.chatInputArea, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
             <View style={styles.chatInputRow}>
               <TextInput
                 style={styles.chatInput}

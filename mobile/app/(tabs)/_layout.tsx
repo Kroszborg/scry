@@ -1,14 +1,26 @@
 import { Tabs } from "expo-router";
-import { View, StyleSheet, Platform } from "react-native";
-import { colors, spacing } from "../../lib/theme";
+import { View, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { colors, radius } from "../../lib/theme";
 import { House, Scan, FolderOpen, Sparkle } from "phosphor-react-native";
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          height: 52 + insets.bottom,
+          paddingBottom: insets.bottom,
+          paddingTop: 10,
+          elevation: 0,
+          shadowOpacity: 0,
+        },
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textTertiary,
         tabBarLabelStyle: styles.tabLabel,
@@ -59,14 +71,6 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: colors.surface,
-    borderTopColor: colors.border,
-    borderTopWidth: 1,
-    height: Platform.OS === "ios" ? 86 : 66,
-    paddingBottom: Platform.OS === "ios" ? 26 : 8,
-    paddingTop: 10,
-  },
   tabLabel: {
     fontSize: 11,
     fontWeight: "500",
@@ -79,7 +83,7 @@ const styles = StyleSheet.create({
   scanDefault: {
     width: 42,
     height: 34,
-    borderRadius: 10,
+    borderRadius: radius.sm,
     backgroundColor: colors.surfaceElevated,
     alignItems: "center",
     justifyContent: "center",
@@ -87,7 +91,7 @@ const styles = StyleSheet.create({
   scanActive: {
     width: 42,
     height: 34,
-    borderRadius: 10,
+    borderRadius: radius.sm,
     backgroundColor: colors.accent,
     alignItems: "center",
     justifyContent: "center",

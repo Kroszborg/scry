@@ -264,6 +264,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: spacing.sm,
     marginBottom: spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
   },
   searchInput: {
     flex: 1,

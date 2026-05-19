@@ -10,7 +10,7 @@ import {
   Platform,
   ActivityIndicator,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useLocalSearchParams } from "expo-router";
@@ -32,6 +32,7 @@ export default function AIScreen() {
   const [input, setInput] = useState("");
   const scrollRef = useRef<ScrollView>(null);
   const didAutoSend = useRef(false);
+  const insets = useSafeAreaInsets();
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({ api: `${api.baseUrl}/api/agent/messages` }),
@@ -58,16 +59,19 @@ export default function AIScreen() {
     setInput("");
   };
 
+  const inputAreaPaddingBottom = Math.max(insets.bottom, spacing.md);
+
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={0}
       >
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.aiIcon}>
-            <Sparkle size={22} color={colors.accent} weight="fill" />
+            <Sparkle size={20} color={colors.accent} weight="fill" />
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.headerTitle}>Scry AI</Text>
@@ -90,7 +94,7 @@ export default function AIScreen() {
           {messages.length === 0 ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIcon}>
-                <Sparkle size={38} color={colors.accent} weight="duotone" />
+                <Sparkle size={36} color={colors.accent} weight="duotone" />
               </View>
               <Text style={styles.emptyTitle}>Ask anything</Text>
               <Text style={styles.emptySub}>
@@ -104,7 +108,7 @@ export default function AIScreen() {
                     onPress={() => sendMessage({ text: s })}
                     activeOpacity={0.75}
                   >
-                    <Sparkle size={12} color={colors.accent} weight="fill" />
+                    <Sparkle size={11} color={colors.accent} weight="fill" />
                     <Text style={styles.suggestionText}>{s}</Text>
                   </TouchableOpacity>
                 ))}
@@ -128,7 +132,7 @@ export default function AIScreen() {
                 >
                   {!isUser && (
                     <View style={styles.aiAvatar}>
-                      <Sparkle size={13} color={colors.accent} weight="fill" />
+                      <Sparkle size={12} color={colors.accent} weight="fill" />
                     </View>
                   )}
                   <View
@@ -153,13 +157,13 @@ export default function AIScreen() {
           {isLoading && (
             <View style={[styles.msgRow, styles.msgRowAI]}>
               <View style={styles.aiAvatar}>
-                <Sparkle size={13} color={colors.accent} weight="fill" />
+                <Sparkle size={12} color={colors.accent} weight="fill" />
               </View>
               <View style={[styles.bubble, styles.bubbleAI, styles.typingBubble]}>
                 <View style={styles.typingDots}>
-                  <View style={[styles.typingDot, styles.typingDot1]} />
-                  <View style={[styles.typingDot, styles.typingDot2]} />
-                  <View style={[styles.typingDot, styles.typingDot3]} />
+                  <View style={styles.typingDot} />
+                  <View style={[styles.typingDot, { opacity: 0.55 }]} />
+                  <View style={[styles.typingDot, { opacity: 0.25 }]} />
                 </View>
               </View>
             </View>
@@ -167,13 +171,13 @@ export default function AIScreen() {
         </ScrollView>
 
         {/* Input */}
-        <View style={styles.inputArea}>
+        <View style={[styles.inputArea, { paddingBottom: inputAreaPaddingBottom }]}>
           <View style={styles.inputRow}>
             <TextInput
               style={styles.input}
               value={input}
               onChangeText={setInput}
-              placeholder="Ask about your documents..."
+              placeholder="Ask about your documents…"
               placeholderTextColor={colors.textTertiary}
               multiline
               maxLength={500}
@@ -192,7 +196,7 @@ export default function AIScreen() {
                 <ActivityIndicator size="small" color={colors.textTertiary} />
               ) : (
                 <ArrowUp
-                  size={18}
+                  size={17}
                   color={input.trim() ? "#fff" : colors.textTertiary}
                   weight="bold"
                 />
@@ -214,12 +218,12 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.lg,
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
   },
   aiIcon: {
-    width: 42,
-    height: 42,
+    width: 40,
+    height: 40,
     borderRadius: radius.full,
     backgroundColor: colors.accentDim,
     alignItems: "center",
@@ -228,10 +232,10 @@ const styles = StyleSheet.create({
     borderColor: colors.accentDimBorder,
   },
   headerTitle: { ...typography.h3 },
-  headerSub: { ...typography.caption, marginTop: 2 },
+  headerSub: { ...typography.caption, marginTop: 1 },
   statusDot: {
-    width: 8,
-    height: 8,
+    width: 7,
+    height: 7,
     borderRadius: 4,
     backgroundColor: colors.textTertiary,
   },
@@ -240,18 +244,18 @@ const styles = StyleSheet.create({
   messages: { flex: 1 },
   messagesContent: {
     padding: spacing.xl,
-    gap: spacing.lg,
+    gap: spacing.md,
     paddingBottom: spacing.xxxl,
   },
 
   emptyState: {
     alignItems: "center",
-    paddingTop: 40,
+    paddingTop: 36,
     gap: spacing.lg,
   },
   emptyIcon: {
-    width: 80,
-    height: 80,
+    width: 76,
+    height: 76,
     borderRadius: radius.full,
     backgroundColor: colors.accentDim,
     alignItems: "center",
@@ -263,7 +267,7 @@ const styles = StyleSheet.create({
   emptySub: {
     ...typography.bodySmall,
     textAlign: "center",
-    maxWidth: 260,
+    maxWidth: 256,
     lineHeight: 20,
   },
   suggestionsGrid: {
@@ -277,11 +281,13 @@ const styles = StyleSheet.create({
   suggestionChip: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 5,
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
     borderRadius: radius.full,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
   },
   suggestionText: {
     ...typography.bodySmall,
@@ -297,13 +303,15 @@ const styles = StyleSheet.create({
   msgRowUser: { justifyContent: "flex-end" },
   msgRowAI: { justifyContent: "flex-start" },
   aiAvatar: {
-    width: 28,
-    height: 28,
+    width: 26,
+    height: 26,
     borderRadius: radius.full,
     backgroundColor: colors.accentDim,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
+    borderWidth: 1,
+    borderColor: colors.accentDimBorder,
   },
   bubble: {
     maxWidth: "78%",
@@ -318,6 +326,8 @@ const styles = StyleSheet.create({
   bubbleAI: {
     backgroundColor: colors.surface,
     borderBottomLeftRadius: 4,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
   },
   bubbleText: {
     fontSize: 15,
@@ -330,29 +340,25 @@ const styles = StyleSheet.create({
   typingBubble: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    minWidth: 60,
+    minWidth: 56,
   },
   typingDots: {
     flexDirection: "row",
     gap: 5,
     alignItems: "center",
-    height: 18,
+    height: 16,
   },
   typingDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: colors.textTertiary,
   },
-  typingDot1: {},
-  typingDot2: { opacity: 0.7 },
-  typingDot3: { opacity: 0.4 },
 
   inputArea: {
     paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
-    paddingBottom: spacing.lg,
-    borderTopWidth: 1,
+    paddingTop: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.border,
   },
   inputRow: {
@@ -375,8 +381,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   sendBtn: {
-    width: 38,
-    height: 38,
+    width: 36,
+    height: 36,
     borderRadius: radius.full,
     backgroundColor: colors.accent,
     alignItems: "center",
