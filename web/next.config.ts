@@ -11,12 +11,6 @@ const nextConfig: NextConfig = {
           { key: "Access-Control-Allow-Headers", value: "Content-Type,Authorization" },
         ],
       },
-      {
-        source: "/download/:file",
-        headers: [
-          { key: "Content-Disposition", value: "attachment" },
-        ],
-      },
     ];
   },
 };
