@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "build:release": "expo prebuild --platform android --no-install && cd android && gradlew.bat assembleRelease --stacktrace",
     "build:aab": "expo prebuild --platform android --no-install && cd android && gradlew.bat bundleRelease --stacktrace",
+    "generate:assets": "node scripts/generate-assets.js",
     "clean:android": "powershell -Command \"Remove-Item android\\app\\build,android\\build,android\\.gradle,android\\app\\.cxx -Recurse -Force -ErrorAction SilentlyContinue; Write-Host 'Android cleaned'\""
   },
   "dependencies": {
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "@types/react": "19.1.17",
+    "sharp": "^0.33.5",
     "typescript": "~5.9.2"
   },
   "private": true

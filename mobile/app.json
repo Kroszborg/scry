@@ -1,30 +1,5 @@
 {
   "expo": {
-    "icon": "./assets/icon.png",
-    "android": {
-      "package": "com.scry_x7k2.runable",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#0B0B0D"
-      },
-      "edgeToEdgeEnabled": true
-    },
-    "extra": {
-      "apiUrl": "https://z7512dle8f43t20tfe8sg-preview-4200.runable.site/",
-      "router": {
-        "headOrigin": "https://z7512dle8f43t20tfe8sg-preview-4300.runable.site",
-        "origin": "https://z7512dle8f43t20tfe8sg-preview-4300.runable.site"
-      }
-    },
-    "ios": {
-      "bundleIdentifier": "com.scry_x7k2.runable",
-      "supportsTablet": false
-    },
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "cover",
-      "backgroundColor": "#0B0B0D"
-    },
     "name": "Scry",
     "slug": "scry",
     "version": "1.0.0",
@@ -32,9 +7,34 @@
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#0B0B0D"
+    },
+    "android": {
+      "package": "com.scry_x7k2.runable",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B0B0D"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "ios": {
+      "bundleIdentifier": "com.scry_x7k2.runable",
+      "supportsTablet": false
+    },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
+    },
+    "extra": {
+      "apiUrl": "https://z7512dle8f43t20tfe8sg-preview-4200.runable.site/",
+      "router": {
+        "headOrigin": "https://z7512dle8f43t20tfe8sg-preview-4300.runable.site",
+        "origin": "https://z7512dle8f43t20tfe8sg-preview-4300.runable.site"
+      }
     },
     "plugins": [
       "expo-router",
