@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "expo start",
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "build:release": "expo prebuild --platform android --no-install && cd android && gradlew.bat assembleRelease --stacktrace",
     "build:aab": "expo prebuild --platform android --no-install && cd android && gradlew.bat bundleRelease --stacktrace",
-    "clean:android": "powershell -Command \"Remove-Item android\\app\\build,android\\build,android\\.gradle,android\\app\\.cxx -Recurse -Force -ErrorAction SilentlyContinue; Write-Host 'Android cleaned'\""
+    "clean:android": "powershell -Command \"Remove-Item android\\app\\build,android\\build,android\\.gradle,android\\app\\.cxx -Recurse -Force -ErrorAction SilentlyContinue; Write-Host 'Android cleaned'\"",
+    "release": "gh release create v1.0.0 --title \"Scry v1.0.0\" --notes \"Scan. Extract. Understand. AI-powered document scanner.\" \"android\\app\\build\\outputs\\apk\\release\\app-release.apk#Scry.apk\""
   },
   "dependencies": {
     "@ai-sdk/react": "^3.0.186",
@@ -31,11 +32,12 @@
     "expo-image-picker": "~17.0.11",
     "expo-linking": "~8.0.11",
     "expo-media-library": "~18.2.1",
-    "expo-print": "~14.0.5",
+    "expo-print": "^14.0.0",
     "expo-router": "~6.0.23",
     "expo-sharing": "~14.0.8",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
+    "expo-system-ui": "^55.0.18",
     "phosphor-react-native": "^3.0.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
